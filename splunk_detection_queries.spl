@@ -1,0 +1,12 @@
+-- Detection 1: Encoded PowerShell Command Execution (MITRE ATT&CK T1059.001)
+index=win_telemetry EventCode=1 Image="*\\powershell.exe" 
+| search CommandLine="*-enc*" OR CommandLine="*-encodedcommand*" OR CommandLine="*bypass*"
+| table _time, host, user, ParentImage, CommandLine
+
+-- Detection 2: Lateral Movement via Remote Service Execution (T1021.002)
+index=win_telemetry EventCode=7045 Service_Name="*"
+| table _time, host, Service_Name, Image_Path, Service_Type
+
+-- Detection 3: Potential Credential Dumping via LSASS Process Access (T1003.001)
+index=win_telemetry EventCode=10 TargetImage="*\\lsass.exe" GrantedAccess="0x1010" OR GrantedAccess="0x1FFFFF"
+| table _time, host, SourceImage, TargetImage, GrantedAccess
